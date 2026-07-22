@@ -1,0 +1,107 @@
+[
+  {
+    "path": "whitepaper/index.md",
+    "layer": "Whitepaper",
+    "title": "index",
+    "outbound_links": [
+      "engineering-guide/logic/state-management.md",
+      "engineering-guide/interaction/timing-constraints.md",
+      "engineering-guide/layout/typography-grid.md",
+      "engineering-guide/tokens/color-gene.md",
+      "engineering-guide/layout/sizing.md"
+    ],
+    "inbound_links": [],
+    "trace_path": [
+      "whitepaper/index.md"
+    ],
+    "related_nodes": [],
+    "cited_by": []
+  },
+  {
+    "path": "engineering-guide/interaction/timing-constraints.md",
+    "layer": "Engineering",
+    "title": "timing-constraints",
+    "outbound_links": [],
+    "inbound_links": [
+      "whitepaper/index.md"
+    ],
+    "trace_path": [
+      "engineering-guide/interaction/timing-constraints.md",
+      "whitepaper/index.md"
+    ],
+    "related_nodes": [],
+    "cited_by": []
+  },
+  {
+    "path": "engineering-guide/layout/sizing.md",
+    "layer": "Engineering",
+    "title": "sizing",
+    "outbound_links": [],
+    "inbound_links": [
+      "whitepaper/index.md"
+    ],
+    "trace_path": [
+      "engineering-guide/layout/sizing.md",
+      "whitepaper/index.md"
+    ],
+    "related_nodes": [],
+    "cited_by": []
+  },
+  {
+    "path": "engineering-guide/layout/typography-grid.md",
+    "layer": "Engineering",
+    "title": "typography-grid",
+    "outbound_links": [],
+    "inbound_links": [
+      "whitepaper/index.md"
+    ],
+    "trace_path": [
+      "engineering-guide/layout/typography-grid.md",
+      "whitepaper/index.md"
+    ],
+    "related_nodes": [],
+    "cited_by": []
+  },
+  {
+    "path": "engineering-guide/logic/state-management.md",
+    "layer": "Engineering",
+    "title": "state-management",
+    "outbound_links": [],
+    "inbound_links": [
+      "whitepaper/index.md"
+    ],
+    "trace_path": [
+      "engineering-guide/logic/state-management.md",
+      "whitepaper/index.md"
+    ],
+    "related_nodes": [],
+    "cited_by": []
+  },
+  {
+    "path": "engineering-guide/tokens/color-gene.md",
+    "layer": "Engineering",
+    "title": "color-gene",
+    "outbound_links": [],
+    "inbound_links": [
+      "whitepaper/index.md"
+    ],
+    "trace_path": [
+      "engineering-guide/tokens/color-gene.md",
+      "whitepaper/index.md"
+    ],
+    "related_nodes": [],
+    "cited_by": []
+  },
+  {
+    "path": "implementation/components/button-usage.md",
+    "layer": "Implementation",
+    "title": "button-usage",
+    "outbound_links": [],
+    "inbound_links": [],
+    "trace_path": [
+      "implementation/components/button-usage.md"
+    ],
+    "related_nodes": [],
+    "cited_by": []
+  }
+]
