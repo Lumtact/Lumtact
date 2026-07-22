@@ -10,22 +10,31 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Path missing' }, { status: 400 });
   }
 
-  // 安全检查：确保路径在 docs 目录下
-  const absolutePath = path.resolve(process.cwd(), '../docs', docPath);
-  
-  // 简单的防穿透检查 (实际生产环境需要更严谨)
-  if (!absolutePath.startsWith(path.resolve(process.cwd(), '../docs'))) {
-     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  // 🔧 修复：文档现在在 public/docs/ 下
+  const docsRoot = path.join(process.cwd(), 'public', 'docs');
+  const absolutePath = path.resolve(docsRoot, docPath);
+
+  // 安全检查：确保路径在 public/docs 目录下，防止目录遍历攻击
+  if (!absolutePath.startsWith(docsRoot)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  // 检查文件是否存在
+  if (!fs.existsSync(absolutePath)) {
+    return NextResponse.json({ 
+      error: 'File not found', 
+      path: docPath,
+      resolved: absolutePath 
+    }, { status: 404 });
   }
 
   try {
     const content = fs.readFileSync(absolutePath, 'utf-8');
-    // 返回纯文本
     return new NextResponse(content, {
       status: 200,
-      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+      headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
     });
   } catch (error) {
-    return NextResponse.json({ error: 'File not found' }, { status: 404 });
+    return NextResponse.json({ error: 'Failed to read file' }, { status: 500 });
   }
 }
