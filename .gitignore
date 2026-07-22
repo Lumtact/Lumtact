@@ -17,3 +17,13 @@ Cargo.lock
 # Build export directories
 dist/
 out/
+
+# Node / NPM
+node_modules/
+package-lock.json
+npm-debug.log*
+.next/
+out/
+
+# Build export
+dist/
