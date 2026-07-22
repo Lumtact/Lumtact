@@ -33,9 +33,14 @@ fn main() {
     let docs_root_abs = fs::canonicalize("../web-viewer/public/docs")
         .expect("Failed to resolve docs root");
 
+    println!("📁 Docs root: {:?}", docs_root_abs);
+
+    let mut file_count = 0;
     for entry in glob(docs_dir).expect("Failed to read glob pattern") {
         match entry {
             Ok(path) => {
+                file_count += 1;
+                println!("🔍 Scanning: {:?}", path.file_name().unwrap_or_default());
                 if let Some(content) = read_file_content(&path) {
                     if let Ok(file_abs) = fs::canonicalize(&path) {
                         let raw_links = parser::extract_markdown_links(&content);
@@ -61,12 +66,19 @@ fn main() {
                             outbound_links,
                             ..Default::default()
                         });
+                    } else {
+                        println!("⚠️  Failed to canonicalize: {:?}", path);
                     }
+                } else {
+                    println!("⚠️  Failed to read content: {:?}", path);
                 }
             }
             Err(e) => println!("Error reading path: {:?}", e),
         }
     }
+
+    println!("📊 Total files scanned: {}", file_count);
+    println!("📊 Nodes generated: {}", nodes.len());
 
     for i in 0..nodes.len() {
         let outbound_links = nodes[i].outbound_links.clone();
@@ -94,7 +106,6 @@ fn read_file_content(path: &Path) -> Option<String> {
     fs::read_to_string(path).ok()
 }
 
-// 🔧 修复：兼容绝对路径（以 / 开头）
 fn normalize_links(current_file_abs: &Path, docs_root_abs: &Path, raw_links: Vec<String>) -> Vec<String> {
     let mut normalized = Vec::new();
     let current_dir = current_file_abs.parent().unwrap_or(current_file_abs);
@@ -107,7 +118,6 @@ fn normalize_links(current_file_abs: &Path, docs_root_abs: &Path, raw_links: Vec
         
         let clean_link = link.split('#').next().unwrap_or(&link);
         
-        // 核心修复：绝对路径以 / 开头，应相对于 docs_root 解析
         let target_path = if clean_link.starts_with('/') {
             docs_root_abs.join(&clean_link[1..])
         } else {
