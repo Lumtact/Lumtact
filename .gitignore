@@ -1,0 +1,18 @@
+# Rust build artifacts
+target/
+Cargo.lock
+**/*.rs.bk
+
+# macOS hidden files
+.DS_Store
+._*
+
+# Editor temporary files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build export directories
+dist/
+out/
