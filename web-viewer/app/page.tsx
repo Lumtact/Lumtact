@@ -48,12 +48,12 @@ export default function KnowledgeHub() {
     }
   }, [selectedNode]);
 
-  // --- 4. 工具函数：根据路径查找节点 ---
+  // 4. 工具函数：根据路径查找节点
   const findNodeByPath = (path: string): Node | undefined => {
     return manifest?.find(n => n.path === path);
   };
 
-  // --- 5. 处理内部链接点击 ---
+  // 5. 处理内部链接点击
   const handleLinkClick = (href: string) => {
     // 外部链接或锚点，不拦截
     if (href.startsWith('http') || href.startsWith('#')) {
@@ -61,32 +61,26 @@ export default function KnowledgeHub() {
       return;
     }
 
-    // 去除可能存在的 .md 扩展名和 # 锚点
-    let targetPath = href.replace(/\.md$/, '').split('#')[0];
-    
+    // 🔧 规范化路径：去除 ./ ../ docs/ 前缀，去除 .md 和锚点
+    let targetPath = href
+      .replace(/^\.\.?\//, '')        // 去除 ./ 或 ../
+      .replace(/^docs\//, '')         // 去除 docs/ 前缀
+      .replace(/\.md$/, '')           // 去除 .md 后缀
+      .split('#')[0];                 // 去除锚点
+
     // 尝试直接匹配
     let target = findNodeByPath(targetPath);
-    
-    // 如果没找到，尝试添加 .md 后缀
     if (!target) {
       target = findNodeByPath(`${targetPath}.md`);
     }
-    
-    // 如果还没找到，尝试在 engineering-guide 等子目录中查找
+    // 如果还没找到，尝试子目录前缀
     if (!target) {
-      // 尝试常见的 docs 子路径
-      const candidates = [
-        `engineering-guide/${targetPath}`,
-        `implementation/${targetPath}`,
-        `whitepaper-archive/${targetPath}`,
-        `${targetPath}`,
-      ];
-      for (const cand of candidates) {
-        const found = findNodeByPath(cand);
-        if (found) {
-          target = found;
-          break;
-        }
+      const subdirs = ['engineering-guide', 'implementation', 'whitepaper-archive'];
+      for (const sub of subdirs) {
+        const found = findNodeByPath(`${sub}/${targetPath}`);
+        if (found) { target = found; break; }
+        const foundMd = findNodeByPath(`${sub}/${targetPath}.md`);
+        if (foundMd) { target = foundMd; break; }
       }
     }
 
@@ -94,9 +88,7 @@ export default function KnowledgeHub() {
       setSelectedNode(target);
     } else {
       console.warn(`[Link] 未找到节点: ${href}`);
-      // 作为后备，尝试直接打开文件（浏览器会显示 raw）
-      // 但为了体验，我们可以提示用户
-      alert(`文档 "${href}" 未在知识图谱中找到，是否查看原始文件？`);
+      // 备选：直接打开 API 查看原始内容
       window.open(`/api/read?path=${encodeURIComponent(href)}`, '_blank');
     }
   };
@@ -195,21 +187,16 @@ export default function KnowledgeHub() {
               </h1>
             </header>
 
-            {/* 内容渲染区：支持暗黑模式 + 内部链接拦截 */}
+            {/* 内容渲染区 */}
             <div className="prose prose-lg prose-indigo dark:prose-invert dark:prose-dark max-w-none prose-headings:font-bold prose-a:text-indigo-600 dark:prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline">
               <ReactMarkdown 
                 remarkPlugins={[remarkGfm]}
                 components={{
-                  // 🔧 核心修复：拦截链接点击
                   a: ({ href, children }) => {
                     if (!href) return <>{children}</>;
-                    
-                    // 外部链接或锚点：正常打开
                     if (href.startsWith('http') || href.startsWith('#')) {
                       return <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>;
                     }
-
-                    // 内部链接：通过 handleLinkClick 处理
                     return (
                       <a
                         href={href}
