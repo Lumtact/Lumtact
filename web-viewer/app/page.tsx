@@ -74,8 +74,9 @@ export default function KnowledgeHub() {
       target = findNodeByPath(`${targetPath}.md`);
     }
     // 如果还没找到，尝试子目录前缀
+    // 🔧 修复：添加 'whitepaper' 映射到 'whitepaper-archive'
     if (!target) {
-      const subdirs = ['engineering-guide', 'implementation', 'whitepaper-archive'];
+      const subdirs = ['engineering-guide', 'implementation', 'whitepaper-archive', 'whitepaper'];
       for (const sub of subdirs) {
         const found = findNodeByPath(`${sub}/${targetPath}`);
         if (found) { target = found; break; }
