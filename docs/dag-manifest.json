@@ -4,30 +4,46 @@
     "layer": "Whitepaper",
     "title": "index",
     "outbound_links": [
+      "engineering-guide/layout/sizing.md",
       "engineering-guide/logic/state-management.md",
-      "engineering-guide/interaction/timing-constraints.md",
       "engineering-guide/layout/typography-grid.md",
       "engineering-guide/tokens/color-gene.md",
-      "engineering-guide/layout/sizing.md"
+      "engineering-guide/interaction/timing-constraints.md"
     ],
-    "inbound_links": [],
+    "inbound_links": [
+      "engineering-guide/layout/typography-grid.md",
+      "engineering-guide/logic/state-management.md",
+      "engineering-guide/tokens/color-gene.md",
+      "engineering-guide/layout/sizing.md",
+      "engineering-guide/interaction/timing-constraints.md"
+    ],
     "trace_path": [
-      "whitepaper/index.md"
+      "whitepaper/index.md",
+      "engineering-guide/layout/typography-grid.md"
     ],
     "related_nodes": [],
-    "cited_by": []
+    "cited_by": [
+      "engineering-guide/layout/typography-grid.md",
+      "engineering-guide/logic/state-management.md",
+      "engineering-guide/tokens/color-gene.md",
+      "engineering-guide/layout/sizing.md",
+      "engineering-guide/interaction/timing-constraints.md"
+    ]
   },
   {
     "path": "engineering-guide/interaction/timing-constraints.md",
     "layer": "Engineering",
     "title": "timing-constraints",
-    "outbound_links": [],
+    "outbound_links": [
+      "whitepaper/index.md"
+    ],
     "inbound_links": [
       "whitepaper/index.md"
     ],
     "trace_path": [
       "engineering-guide/interaction/timing-constraints.md",
-      "whitepaper/index.md"
+      "whitepaper/index.md",
+      "engineering-guide/layout/typography-grid.md"
     ],
     "related_nodes": [],
     "cited_by": []
@@ -36,22 +52,30 @@
     "path": "engineering-guide/layout/sizing.md",
     "layer": "Engineering",
     "title": "sizing",
-    "outbound_links": [],
-    "inbound_links": [
+    "outbound_links": [
       "whitepaper/index.md"
+    ],
+    "inbound_links": [
+      "whitepaper/index.md",
+      "implementation/components/button-usage.md"
     ],
     "trace_path": [
       "engineering-guide/layout/sizing.md",
-      "whitepaper/index.md"
+      "whitepaper/index.md",
+      "engineering-guide/layout/typography-grid.md"
     ],
     "related_nodes": [],
-    "cited_by": []
+    "cited_by": [
+      "implementation/components/button-usage.md"
+    ]
   },
   {
     "path": "engineering-guide/layout/typography-grid.md",
     "layer": "Engineering",
     "title": "typography-grid",
-    "outbound_links": [],
+    "outbound_links": [
+      "whitepaper/index.md"
+    ],
     "inbound_links": [
       "whitepaper/index.md"
     ],
@@ -66,37 +90,53 @@
     "path": "engineering-guide/logic/state-management.md",
     "layer": "Engineering",
     "title": "state-management",
-    "outbound_links": [],
-    "inbound_links": [
+    "outbound_links": [
       "whitepaper/index.md"
+    ],
+    "inbound_links": [
+      "whitepaper/index.md",
+      "implementation/components/button-usage.md"
     ],
     "trace_path": [
       "engineering-guide/logic/state-management.md",
-      "whitepaper/index.md"
+      "whitepaper/index.md",
+      "engineering-guide/layout/typography-grid.md"
     ],
     "related_nodes": [],
-    "cited_by": []
+    "cited_by": [
+      "implementation/components/button-usage.md"
+    ]
   },
   {
     "path": "engineering-guide/tokens/color-gene.md",
     "layer": "Engineering",
     "title": "color-gene",
-    "outbound_links": [],
-    "inbound_links": [
+    "outbound_links": [
       "whitepaper/index.md"
+    ],
+    "inbound_links": [
+      "whitepaper/index.md",
+      "implementation/components/button-usage.md"
     ],
     "trace_path": [
       "engineering-guide/tokens/color-gene.md",
-      "whitepaper/index.md"
+      "whitepaper/index.md",
+      "engineering-guide/layout/typography-grid.md"
     ],
     "related_nodes": [],
-    "cited_by": []
+    "cited_by": [
+      "implementation/components/button-usage.md"
+    ]
   },
   {
     "path": "implementation/components/button-usage.md",
     "layer": "Implementation",
     "title": "button-usage",
-    "outbound_links": [],
+    "outbound_links": [
+      "engineering-guide/tokens/color-gene.md",
+      "engineering-guide/logic/state-management.md",
+      "engineering-guide/layout/sizing.md"
+    ],
     "inbound_links": [],
     "trace_path": [
       "implementation/components/button-usage.md"
