@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 use std::fs;
-use std::path::Path; // 移除了 PathBuf
+use std::path::Path;
 use glob::glob;
 use serde::{Deserialize, Serialize};
 
@@ -26,12 +26,10 @@ struct Node {
 fn main() {
     println!("🚀 Starting DAG Generation...");
     
-    // 🔧 修改1: 指向新位置
     let docs_dir = "../web-viewer/public/docs/**/*.md";
     let mut nodes: Vec<Node> = Vec::new();
     let mut path_to_index: HashMap<String, usize> = HashMap::new();
 
-    // 🔧 修改2: 指向新位置
     let docs_root_abs = fs::canonicalize("../web-viewer/public/docs")
         .expect("Failed to resolve docs root");
 
@@ -87,8 +85,6 @@ fn main() {
     }
 
     let json = serde_json::to_string_pretty(&nodes).expect("Failed to serialize");
-    
-    // 🔧 修改3: 输出到 public 目录
     fs::write("../web-viewer/public/dag-manifest.json", json)
         .expect("Failed to write manifest");
     println!("✅ Manifest generated: ../web-viewer/public/dag-manifest.json");
@@ -98,6 +94,7 @@ fn read_file_content(path: &Path) -> Option<String> {
     fs::read_to_string(path).ok()
 }
 
+// 🔧 修复：兼容绝对路径（以 / 开头）
 fn normalize_links(current_file_abs: &Path, docs_root_abs: &Path, raw_links: Vec<String>) -> Vec<String> {
     let mut normalized = Vec::new();
     let current_dir = current_file_abs.parent().unwrap_or(current_file_abs);
@@ -109,7 +106,13 @@ fn normalize_links(current_file_abs: &Path, docs_root_abs: &Path, raw_links: Vec
         }
         
         let clean_link = link.split('#').next().unwrap_or(&link);
-        let target_path = current_dir.join(clean_link);
+        
+        // 核心修复：绝对路径以 / 开头，应相对于 docs_root 解析
+        let target_path = if clean_link.starts_with('/') {
+            docs_root_abs.join(&clean_link[1..])
+        } else {
+            current_dir.join(clean_link)
+        };
         
         if let Ok(canonical_target) = fs::canonicalize(&target_path) {
             if canonical_target.extension().map_or(false, |ext| ext == "md") {
@@ -126,7 +129,7 @@ fn normalize_links(current_file_abs: &Path, docs_root_abs: &Path, raw_links: Vec
 }
 
 fn detect_layer(path: &str) -> String {
-    if path.starts_with("whitepaper") {
+    if path.starts_with("whitepaper") || path.starts_with("whitepaper-archive") {
         "Whitepaper".to_string()
     } else if path.starts_with("engineering-guide") {
         "Engineering".to_string()

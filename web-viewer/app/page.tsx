@@ -17,7 +17,6 @@ export default function KnowledgeHub() {
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [markdownContent, setMarkdownContent] = useState<string>('');
 
-  // 1. 加载 Manifest
   useEffect(() => {
     fetch('/dag-manifest.json')
       .then(res => res.json())
@@ -25,7 +24,6 @@ export default function KnowledgeHub() {
       .catch(console.error);
   }, []);
 
-  // 2. 如果有数据但没选中，默认选中白皮书首页
   useEffect(() => {
     if (manifest && !selectedNode) {
       const whitepaper = manifest.find(n => n.layer === 'Whitepaper' && n.path.includes('index'));
@@ -38,7 +36,6 @@ export default function KnowledgeHub() {
     }
   }, [manifest, selectedNode]);
 
-  // 3. 加载内容
   useEffect(() => {
     if (selectedNode) {
       fetch(`/api/read?path=${encodeURIComponent(selectedNode.path)}`)
@@ -48,34 +45,32 @@ export default function KnowledgeHub() {
     }
   }, [selectedNode]);
 
-  // 4. 工具函数：根据路径查找节点
   const findNodeByPath = (path: string): Node | undefined => {
     return manifest?.find(n => n.path === path);
   };
 
-  // 5. 处理内部链接点击
   const handleLinkClick = (href: string) => {
-    // 外部链接或锚点，不拦截
     if (href.startsWith('http') || href.startsWith('#')) {
       window.open(href, '_blank');
       return;
     }
 
-    // 🔧 规范化路径：去除 ./ ../ docs/ 前缀，去除 .md 和锚点
+    // 🔧 修复：去除前导斜杠（绝对路径）和冗余前缀
     let targetPath = href
-      .replace(/^\.\.?\//, '')        // 去除 ./ 或 ../
-      .replace(/^docs\//, '')         // 去除 docs/ 前缀
-      .replace(/\.md$/, '')           // 去除 .md 后缀
-      .split('#')[0];                 // 去除锚点
+      .replace(/^\/+/, '')          // ⬅️ 新增：去除前导斜杠
+      .replace(/^\.\.?\//, '')      // 去除 ./ 或 ../
+      .replace(/^docs\//, '')       // 去除 docs/ 前缀
+      .replace(/\.md$/, '')         // 去除 .md 后缀
+      .split('#')[0];               // 去除锚点
 
-    // 尝试直接匹配
     let target = findNodeByPath(targetPath);
     if (!target) {
-      target = findNodeByPath(`${targetPath}.md`);
+      // 尝试加 .md
+      const withExt = findNodeByPath(`${targetPath}.md`);
+      if (withExt) { target = withExt; }
     }
-    // 如果还没找到，尝试子目录前缀
-    // 🔧 修复：添加 'whitepaper' 映射到 'whitepaper-archive'
     if (!target) {
+      // 尝试在已知子目录中查找
       const subdirs = ['engineering-guide', 'implementation', 'whitepaper-archive', 'whitepaper'];
       for (const sub of subdirs) {
         const found = findNodeByPath(`${sub}/${targetPath}`);
@@ -84,26 +79,34 @@ export default function KnowledgeHub() {
         if (foundMd) { target = foundMd; break; }
       }
     }
+    // 文件名模糊匹配（兜底）
+    if (!target) {
+      const fileName = targetPath.split('/').pop();
+      if (fileName) {
+        target = manifest?.find(n => n.path.endsWith(`/${fileName}`) || n.path.endsWith(`/${fileName}.md`));
+        if (!target) {
+          target = manifest?.find(n => n.path.includes(`/${fileName}`) || n.path.includes(`/${fileName}.md`));
+        }
+      }
+    }
 
     if (target) {
       setSelectedNode(target);
     } else {
       console.warn(`[Link] 未找到节点: ${href}`);
-      // 备选：直接打开 API 查看原始内容
-      window.open(`/api/read?path=${encodeURIComponent(href)}`, '_blank');
+      // 回退：去除锚点后调用 API
+      const cleanHref = href.split('#')[0];
+      window.open(`/api/read?path=${encodeURIComponent(cleanHref)}`, '_blank');
     }
   };
 
-  // --- 渲染逻辑 ---
-
+  // --- 渲染逻辑（保持不变） ---
   if (!manifest) return <div className="h-screen flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-mono">系统初始化中...</div>;
 
   const layers = ['Whitepaper', 'Engineering', 'Implementation'];
 
   return (
     <div className="flex h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-200">
-      
-      {/* 左侧：分层导航 */}
       <aside className="w-80 bg-white/80 backdrop-blur-md border-r border-gray-200 dark:border-gray-800 dark:bg-gray-900/80 overflow-y-auto">
         <div className="p-6 border-b border-gray-200 dark:border-gray-800">
           <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
@@ -161,12 +164,9 @@ export default function KnowledgeHub() {
         </div>
       </aside>
 
-      {/* 右侧：阅读器 */}
       <main className="flex-1 overflow-y-auto bg-gray-50/50 dark:bg-gray-900/50">
         {selectedNode ? (
           <article className="max-w-3xl mx-auto min-h-screen py-12 px-8">
-            
-            {/* 面包屑导航 */}
             <nav className="mb-8 flex flex-wrap items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
               {selectedNode.trace_path.map((p, i) => (
                 <span key={i} className="flex items-center gap-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
@@ -178,7 +178,6 @@ export default function KnowledgeHub() {
               ))}
             </nav>
 
-            {/* 标题区 */}
             <header className="mb-10 pb-8 border-b border-gray-200 dark:border-gray-800">
               <div className="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-white rounded-full bg-gradient-to-r from-indigo-500 to-violet-500">
                 {selectedNode.layer}
@@ -188,7 +187,6 @@ export default function KnowledgeHub() {
               </h1>
             </header>
 
-            {/* 内容渲染区 */}
             <div className="prose prose-lg prose-indigo dark:prose-invert dark:prose-dark max-w-none prose-headings:font-bold prose-a:text-indigo-600 dark:prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline">
               <ReactMarkdown 
                 remarkPlugins={[remarkGfm]}
@@ -218,7 +216,6 @@ export default function KnowledgeHub() {
               </ReactMarkdown>
             </div>
 
-            {/* 底部依赖链 */}
             {selectedNode.outbound_links.length > 0 && (
               <div className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-800">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4">
