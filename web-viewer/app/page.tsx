@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ReactMarkdown from 'react-markdown'; // 引入解析器
-import remarkGfm from 'remark-gfm'; // 支持表格等 GFM 语法
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface Node {
   path: string;
@@ -28,12 +28,10 @@ export default function KnowledgeHub() {
   // 2. 如果有数据但没选中，默认选中白皮书首页
   useEffect(() => {
     if (manifest && !selectedNode) {
-      // 优先找白皮书层级的 index.md
       const whitepaper = manifest.find(n => n.layer === 'Whitepaper' && n.path.includes('index'));
       if (whitepaper) {
         setSelectedNode(whitepaper);
       } else {
-        // 否则选第一个白皮书节点
         const root = manifest.find(n => n.layer === 'Whitepaper');
         if (root) setSelectedNode(root);
       }
@@ -50,11 +48,63 @@ export default function KnowledgeHub() {
     }
   }, [selectedNode]);
 
+  // --- 4. 工具函数：根据路径查找节点 ---
+  const findNodeByPath = (path: string): Node | undefined => {
+    return manifest?.find(n => n.path === path);
+  };
+
+  // --- 5. 处理内部链接点击 ---
+  const handleLinkClick = (href: string) => {
+    // 外部链接或锚点，不拦截
+    if (href.startsWith('http') || href.startsWith('#')) {
+      window.open(href, '_blank');
+      return;
+    }
+
+    // 去除可能存在的 .md 扩展名和 # 锚点
+    let targetPath = href.replace(/\.md$/, '').split('#')[0];
+    
+    // 尝试直接匹配
+    let target = findNodeByPath(targetPath);
+    
+    // 如果没找到，尝试添加 .md 后缀
+    if (!target) {
+      target = findNodeByPath(`${targetPath}.md`);
+    }
+    
+    // 如果还没找到，尝试在 engineering-guide 等子目录中查找
+    if (!target) {
+      // 尝试常见的 docs 子路径
+      const candidates = [
+        `engineering-guide/${targetPath}`,
+        `implementation/${targetPath}`,
+        `whitepaper-archive/${targetPath}`,
+        `${targetPath}`,
+      ];
+      for (const cand of candidates) {
+        const found = findNodeByPath(cand);
+        if (found) {
+          target = found;
+          break;
+        }
+      }
+    }
+
+    if (target) {
+      setSelectedNode(target);
+    } else {
+      console.warn(`[Link] 未找到节点: ${href}`);
+      // 作为后备，尝试直接打开文件（浏览器会显示 raw）
+      // 但为了体验，我们可以提示用户
+      alert(`文档 "${href}" 未在知识图谱中找到，是否查看原始文件？`);
+      window.open(`/api/read?path=${encodeURIComponent(href)}`, '_blank');
+    }
+  };
+
   // --- 渲染逻辑 ---
 
   if (!manifest) return <div className="h-screen flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-mono">系统初始化中...</div>;
 
-  // 定义层级顺序
   const layers = ['Whitepaper', 'Engineering', 'Implementation'];
 
   return (
@@ -74,7 +124,6 @@ export default function KnowledgeHub() {
             const layerNodes = manifest.filter(n => n.layer === layerName);
             if (layerNodes.length === 0) return null;
 
-            // 层级样式配置
             const layerConfig = {
               'Whitepaper': { color: 'text-purple-600 dark:text-purple-400', icon: '💎' },
               'Engineering': { color: 'text-blue-600 dark:text-blue-400', icon: '🔧' },
@@ -104,7 +153,6 @@ export default function KnowledgeHub() {
                       }`}>
                         {node.title}
                       </div>
-                      {/* 显示追溯条数，表示该文档的深度 */}
                       {node.trace_path.length > 1 && (
                         <div className="text-xs text-gray-400 mt-1 flex items-center gap-1">
                            <span className="w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-600"></span>
@@ -147,9 +195,37 @@ export default function KnowledgeHub() {
               </h1>
             </header>
 
-            {/* 内容渲染区：支持暗黑模式 */}
+            {/* 内容渲染区：支持暗黑模式 + 内部链接拦截 */}
             <div className="prose prose-lg prose-indigo dark:prose-invert dark:prose-dark max-w-none prose-headings:font-bold prose-a:text-indigo-600 dark:prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              <ReactMarkdown 
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  // 🔧 核心修复：拦截链接点击
+                  a: ({ href, children }) => {
+                    if (!href) return <>{children}</>;
+                    
+                    // 外部链接或锚点：正常打开
+                    if (href.startsWith('http') || href.startsWith('#')) {
+                      return <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>;
+                    }
+
+                    // 内部链接：通过 handleLinkClick 处理
+                    return (
+                      <a
+                        href={href}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleLinkClick(href);
+                        }}
+                        className="cursor-pointer text-indigo-600 dark:text-indigo-400 hover:underline"
+                        title={`点击加载 "${href}"`}
+                      >
+                        {children}
+                      </a>
+                    );
+                  },
+                }}
+              >
                 {markdownContent}
               </ReactMarkdown>
             </div>
