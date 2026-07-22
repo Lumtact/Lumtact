@@ -13,19 +13,21 @@ export const LumtractButton = ({
   children, 
   onClick 
 }: ButtonProps) => {
-  // 基础骨架：硅基的精确（去除了完美的圆形，改为更自然的圆角）
+  // 硅基骨架：碳基的有机圆角
   const base = "rounded-xl font-semibold transition-all duration-300 active:scale-95 relative overflow-hidden group";
   
-  // 样式体系：碳基的流动
+  // 基于公理推导的样式体系
   const styles = {
-    // 实心水滴：深蓝背景 + 内部微光
-    solid: "bg-blue-600 text-white shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] hover:bg-blue-500 hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] border border-blue-500/20",
+    // Solid: 高能凝聚态
+    solid: "bg-blue-500 text-white shadow-[0_0_15px_rgba(59,130,246,0.5)] hover:bg-blue-400 hover:shadow-[0_0_25px_rgba(59,130,246,0.6)] border border-blue-400",
     
-    // 玻璃态：半透明 + 模糊边框 (这是最像“水”的状态)
-    glass: "bg-white/5 backdrop-blur-md text-blue-100 border border-white/10 hover:bg-white/10 hover:border-white/20 shadow-[0_2px_10px_rgba(255,255,255,0.05)]",
+    // Glass: 丁达尔效应 - 模拟光束穿过水体
+    // 推导点：text-white (光源) + shadow (散射) + backdrop-blur (水体密度)
+    glass: "bg-blue-500/10 backdrop-blur-md text-white border border-white/10 shadow-[0_0_10px_rgba(255,255,255,0.1)] hover:bg-blue-500/20 hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:border-white/30",
     
-    // 幽灵：最轻量，仅保留文字光感
-    ghost: "text-blue-400 hover:text-blue-200 hover:bg-blue-500/10"
+    // Ghost: 能量离散态
+    // 推导点：默认仅微亮，悬浮时能量聚集产生光晕，而非生硬色块
+    ghost: "text-blue-50 hover:text-white hover:bg-blue-500/15 hover:shadow-[0_0_15px_rgba(59,130,246,0.2)]"
   };
 
   const sizes = {
@@ -34,21 +36,16 @@ export const LumtractButton = ({
     lg: "px-8 py-3 text-lg"
   };
 
-  // 增加一点“高光”效果：模拟水面反光
-  const highlight = mode === 'solid' 
-    ? `<span class="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />` 
-    : '';
-
   return (
     <button 
       className={`${base} ${styles[mode]} ${sizes[size]}`}
       onClick={onClick}
-      // 移除了 ring-offset，改用 outline:none 消除默认丑陋的外圈
       style={{ outline: 'none' }}
     >
       {children}
+      {/* 仅在 Solid 模式保留高光流过，模拟液面极速掠过 */}
       {mode === 'solid' && (
-        <span className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+        <span className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
       )}
     </button>
   );
