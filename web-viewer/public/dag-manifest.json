@@ -1,17 +1,48 @@
 [
   {
+    "path": "archive.md",
+    "layer": "Unknown",
+    "title": "水之波光 · 触境 · 实例档案",
+    "outbound_links": [],
+    "inbound_links": [],
+    "trace_path": [
+      "archive.md"
+    ],
+    "related_nodes": [],
+    "cited_by": []
+  },
+  {
+    "path": "constraints.md",
+    "layer": "Unknown",
+    "title": "水之波光 · 触境",
+    "outbound_links": [],
+    "inbound_links": [],
+    "trace_path": [
+      "constraints.md"
+    ],
+    "related_nodes": [],
+    "cited_by": []
+  },
+  {
+    "path": "derivation.md",
+    "layer": "Unknown",
+    "title": "水之波光 · 触境",
+    "outbound_links": [],
+    "inbound_links": [],
+    "trace_path": [
+      "derivation.md"
+    ],
+    "related_nodes": [],
+    "cited_by": []
+  },
+  {
     "path": "engineering-guide/interaction/timing-constraints.md",
     "layer": "Engineering",
     "title": "时间与动效约束",
-    "outbound_links": [
-      "whitepaper/index.md"
-    ],
-    "inbound_links": [
-      "whitepaper/index.md"
-    ],
+    "outbound_links": [],
+    "inbound_links": [],
     "trace_path": [
-      "engineering-guide/interaction/timing-constraints.md",
-      "whitepaper/index.md"
+      "engineering-guide/interaction/timing-constraints.md"
     ],
     "related_nodes": [],
     "cited_by": []
@@ -20,17 +51,13 @@
     "path": "engineering-guide/layout/sizing.md",
     "layer": "Engineering",
     "title": "布局与尺寸规范",
-    "outbound_links": [
-      "whitepaper/index.md"
-    ],
+    "outbound_links": [],
     "inbound_links": [
       "engineering-guide/logic/state-management.md",
-      "implementation/components/button-usage.md",
-      "whitepaper/index.md"
+      "implementation/components/button-usage.md"
     ],
     "trace_path": [
-      "engineering-guide/layout/sizing.md",
-      "whitepaper/index.md"
+      "engineering-guide/layout/sizing.md"
     ],
     "related_nodes": [],
     "cited_by": []
@@ -39,15 +66,10 @@
     "path": "engineering-guide/layout/typography-grid.md",
     "layer": "Engineering",
     "title": "排版与栅格系统",
-    "outbound_links": [
-      "whitepaper/index.md"
-    ],
-    "inbound_links": [
-      "whitepaper/index.md"
-    ],
+    "outbound_links": [],
+    "inbound_links": [],
     "trace_path": [
-      "engineering-guide/layout/typography-grid.md",
-      "whitepaper/index.md"
+      "engineering-guide/layout/typography-grid.md"
     ],
     "related_nodes": [],
     "cited_by": []
@@ -57,16 +79,13 @@
     "layer": "Engineering",
     "title": "状态管理逻辑",
     "outbound_links": [
-      "whitepaper/index.md",
       "engineering-guide/layout/sizing.md"
     ],
     "inbound_links": [
-      "implementation/components/button-usage.md",
-      "whitepaper/index.md"
+      "implementation/components/button-usage.md"
     ],
     "trace_path": [
-      "engineering-guide/logic/state-management.md",
-      "whitepaper/index.md"
+      "engineering-guide/logic/state-management.md"
     ],
     "related_nodes": [],
     "cited_by": []
@@ -75,16 +94,12 @@
     "path": "engineering-guide/tokens/color-gene.md",
     "layer": "Engineering",
     "title": "颜色基因映射",
-    "outbound_links": [
-      "whitepaper/index.md"
-    ],
+    "outbound_links": [],
     "inbound_links": [
-      "implementation/components/button-usage.md",
-      "whitepaper/index.md"
+      "implementation/components/button-usage.md"
     ],
     "trace_path": [
-      "engineering-guide/tokens/color-gene.md",
-      "whitepaper/index.md"
+      "engineering-guide/tokens/color-gene.md"
     ],
     "related_nodes": [],
     "cited_by": []
@@ -101,32 +116,43 @@
     "inbound_links": [],
     "trace_path": [
       "implementation/components/button-usage.md",
-      "engineering-guide/layout/sizing.md",
-      "whitepaper/index.md"
+      "engineering-guide/layout/sizing.md"
     ],
     "related_nodes": [],
     "cited_by": []
   },
   {
-    "path": "whitepaper/index.md",
-    "layer": "Whitepaper",
+    "path": "philosophy.md",
+    "layer": "Unknown",
     "title": "水之波光 · 触境",
-    "outbound_links": [
-      "engineering-guide/interaction/timing-constraints.md",
-      "engineering-guide/logic/state-management.md",
-      "engineering-guide/tokens/color-gene.md",
-      "engineering-guide/layout/sizing.md",
-      "engineering-guide/layout/typography-grid.md"
-    ],
-    "inbound_links": [
-      "engineering-guide/interaction/timing-constraints.md",
-      "engineering-guide/layout/sizing.md",
-      "engineering-guide/layout/typography-grid.md",
-      "engineering-guide/logic/state-management.md",
-      "engineering-guide/tokens/color-gene.md"
-    ],
+    "outbound_links": [],
+    "inbound_links": [],
     "trace_path": [
-      "whitepaper/index.md"
+      "philosophy.md"
+    ],
+    "related_nodes": [],
+    "cited_by": []
+  },
+  {
+    "path": "system-summary.md",
+    "layer": "Unknown",
+    "title": "水之波光 · 触境 · 体系总纲",
+    "outbound_links": [],
+    "inbound_links": [],
+    "trace_path": [
+      "system-summary.md"
+    ],
+    "related_nodes": [],
+    "cited_by": []
+  },
+  {
+    "path": "whitepaper-archive/index.md",
+    "layer": "Whitepaper",
+    "title": "Lumtract 项目实例档案 v1.0.1",
+    "outbound_links": [],
+    "inbound_links": [],
+    "trace_path": [
+      "whitepaper-archive/index.md"
     ],
     "related_nodes": [],
     "cited_by": []

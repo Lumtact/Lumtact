@@ -26,11 +26,14 @@ struct Node {
 fn main() {
     println!("🚀 Starting DAG Generation...");
     
-    let docs_dir = "../docs/**/*.md";
+    // 🔧 修改1: 指向新位置
+    let docs_dir = "../web-viewer/public/docs/**/*.md";
     let mut nodes: Vec<Node> = Vec::new();
     let mut path_to_index: HashMap<String, usize> = HashMap::new();
 
-    let docs_root_abs = fs::canonicalize("../docs").expect("Failed to resolve docs root");
+    // 🔧 修改2: 指向新位置
+    let docs_root_abs = fs::canonicalize("../web-viewer/public/docs")
+        .expect("Failed to resolve docs root");
 
     for entry in glob(docs_dir).expect("Failed to read glob pattern") {
         match entry {
@@ -84,8 +87,11 @@ fn main() {
     }
 
     let json = serde_json::to_string_pretty(&nodes).expect("Failed to serialize");
-    fs::write("../docs/dag-manifest.json", json).expect("Failed to write manifest");
-    println!("✅ Manifest generated: ../docs/dag-manifest.json");
+    
+    // 🔧 修改3: 输出到 public 目录
+    fs::write("../web-viewer/public/dag-manifest.json", json)
+        .expect("Failed to write manifest");
+    println!("✅ Manifest generated: ../web-viewer/public/dag-manifest.json");
 }
 
 fn read_file_content(path: &Path) -> Option<String> {
