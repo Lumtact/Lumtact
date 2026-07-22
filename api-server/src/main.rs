@@ -6,7 +6,7 @@ use axum::{
     Json,
 };
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, fs, path::PathBuf, sync::Arc};
+use std::{collections::{HashMap, HashSet}, fs, path::PathBuf, sync::Arc};
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing_subscriber;
 
@@ -53,6 +53,21 @@ struct AppState {
     docs_root: PathBuf,
 }
 
+// 辅助函数：获取层级值
+fn layer_value(layer: &str) -> u8 {
+    match layer {
+        "Whitepaper" => 2,
+        "Engineering" => 1,
+        "Implementation" => 0,
+        _ => 0,
+    }
+}
+
+// 辅助函数：检查是否是向上一层
+fn is_upper_layer(current: &str, target: &str) -> bool {
+    layer_value(target) > layer_value(current)
+}
+
 #[tokio::main]
 async fn main() {
     // 初始化日志
@@ -77,7 +92,7 @@ async fn main() {
         docs_root,
     });
 
-    // 3. 构建路由 - 修复：使用 /*rest 来匹配包含斜杠的路径
+    // 3. 构建路由
     let app = Router::new()
         .route("/health", get(health_check))
         .route("/api/v1/trace/*node_path", get(get_trace))
@@ -86,7 +101,7 @@ async fn main() {
         .layer(
             TraceLayer::new_for_http()
         )
-        .layer(CorsLayer::permissive()) // 允许所有来源
+        .layer(CorsLayer::permissive())
         .with_state(state);
 
     // 4. 启动服务器
@@ -100,20 +115,38 @@ async fn health_check() -> &'static str {
     "OK"
 }
 
+// 修复：正确的追溯逻辑 - 沿着 outbound_links 向上追溯
+fn calculate_trace(node: &Node, nodes: &HashMap<String, Node>, visited: &mut HashSet<String>) -> Vec<String> {
+    if visited.contains(&node.path) {
+        return Vec::new();
+    }
+    
+    visited.insert(node.path.clone());
+    let mut path_list = vec![node.path.clone()];
+    
+    // 沿着 outbound_links 追溯，且只向上一层追溯
+    for outbound_path in &node.outbound_links {
+        if let Some(target_node) = nodes.get(outbound_path) {
+            if is_upper_layer(&node.layer, &target_node.layer) {
+                path_list.extend(calculate_trace(target_node, nodes, visited));
+                break; // 只取第一个上级节点，避免多路径复杂化
+            }
+        }
+    }
+    
+    path_list
+}
+
 // 获取完整追溯路径 + 文档内容
 async fn get_trace(
     State(state): State<Arc<AppState>>,
     Path(node_path): Path<String>,
 ) -> impl IntoResponse {
-    // Axum 会自动去掉前导斜杠，但我们要确保路径格式一致
     let clean_path = node_path.trim_start_matches('/').to_string();
-    
-    // URL 解码（处理 %2F 等）
     let clean_path = urlencoding::decode(&clean_path).unwrap_or(clean_path.as_str().into()).to_string();
 
     println!("🔍 Tracing: {}", clean_path);
 
-    // 查找节点
     let node = match state.manifest.get(&clean_path) {
         Some(n) => n,
         None => {
@@ -122,9 +155,15 @@ async fn get_trace(
         }
     };
 
+    // 修复：使用正确的追溯逻辑
+    let mut visited = HashSet::new();
+    let trace_path = calculate_trace(node, &state.manifest, &mut visited);
+
+    println!("📊 Trace path: {:?}", trace_path);
+
     // 收集所有 trace_path 中的文档内容
     let mut documents = Vec::new();
-    for path in &node.trace_path {
+    for path in &trace_path {
         let target_node = match state.manifest.get(path) {
             Some(n) => n,
             None => continue,
@@ -147,7 +186,7 @@ async fn get_trace(
 
     let response = TraceResponse {
         query_node: clean_path,
-        trace_path: node.trace_path.clone(),
+        trace_path,
         documents,
     };
 
@@ -159,10 +198,7 @@ async fn get_node(
     State(state): State<Arc<AppState>>,
     Path(node_path): Path<String>,
 ) -> impl IntoResponse {
-    // 去掉前导斜杠
     let clean_path = node_path.trim_start_matches('/').to_string();
-    
-    // URL 解码
     let clean_path = urlencoding::decode(&clean_path).unwrap_or(clean_path.as_str().into()).to_string();
     
     println!("🔍 Getting node: {}", clean_path);
