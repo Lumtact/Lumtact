@@ -7,7 +7,7 @@
 ## 1. 基础用法
 Button 组件默认继承涟漪层基因色，并严格遵循状态互斥原则。
 ```jsx
-import { Button } from '@lumtact/ui';
+import { Button } from '@lumtract/ui';
 <Button onClick={handleClick}>
   确认提交
 </Button>

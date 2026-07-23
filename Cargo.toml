@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "dag-generator",
+    "api-server",
+]
+resolver = "2"

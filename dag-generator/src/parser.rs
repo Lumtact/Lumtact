@@ -33,7 +33,7 @@ mod tests {
 这是一个真实的文档引用: [布局规范](../../engineering-guide/layout/sizing.md)。
 下面的代码块里虽然也有链接格式，但应该被忽略：
 ```jsx
-import { Button } from '@lumtact/ui';
+import { Button } from '@lumtract/ui';
 // 下面这段看起来像链接，但在代码里，不应该被提取
 [链接到指南](../../engineering-guide/tokens/color-gene.md)
 ```
